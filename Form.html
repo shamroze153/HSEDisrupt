@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 20px 16px 40px; background: #f4f4f2; color: #1a1a1a; }
+  .loc { font-size: 13px; color: #666; text-align: center; margin-bottom: 4px; }
+  h1 { font-size: 22px; text-align: center; margin: 0 0 20px; }
+  .call-btn { display: block; text-align: center; background: #1a3c34; color: #fff; text-decoration: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600; margin-bottom: 24px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .type-btn { padding: 22px 8px; border-radius: 12px; border: 2px solid #ddd; background: #fff; font-size: 16px; font-weight: 600; text-align: center; cursor: pointer; }
+  .type-btn.fire { color: #A32D2D; }
+  .type-btn.medical { color: #185FA5; }
+  .type-btn.security { color: #854F0B; }
+  .type-btn.other { color: #444; }
+  .type-btn.selected { border-color: currentColor; background: #fafafa; }
+  #confirm { display: none; }
+  #confirm.show { display: block; }
+  textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 15px; min-height: 70px; margin-bottom: 14px; }
+  .send-btn { width: 100%; padding: 16px; border: none; border-radius: 10px; background: #A32D2D; color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; }
+  .hint { font-size: 12px; color: #888; text-align: center; margin-top: 10px; }
+</style>
+</head>
+<body>
+  <div class="loc"><?= locName ?></div>
+  <h1>Report an emergency</h1>
+
+  <a class="call-btn" href="tel:<?= callNumber ?>">Call now: <?= callNumber ?></a>
+
+  <div class="grid" id="typeGrid">
+    <div class="type-btn fire" data-type="Fire">Fire</div>
+    <div class="type-btn medical" data-type="Medical">Medical</div>
+    <div class="type-btn security" data-type="Security">Security</div>
+    <div class="type-btn other" data-type="Other">Other</div>
+  </div>
+
+  <div id="confirm">
+    <form id="alertForm" method="POST">
+      <input type="hidden" name="loc" value="<?= locId ?>">
+      <input type="hidden" name="name" value="<?= locName ?>">
+      <input type="hidden" name="type" id="typeField">
+      <input type="hidden" name="lat" id="latField">
+      <input type="hidden" name="lng" id="lngField">
+      <textarea name="note" placeholder="Optional: what's happening (helps responders)"></textarea>
+      <button type="submit" class="send-btn" id="sendBtn">Send alert</button>
+    </form>
+    <div class="hint">Responders are notified automatically once you send.</div>
+  </div>
+
+<script>
+  var buttons = document.querySelectorAll('.type-btn');
+  var confirmBox = document.getElementById('confirm');
+  var typeField = document.getElementById('typeField');
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      buttons.forEach(function (b) { b.classList.remove('selected'); });
+      btn.classList.add('selected');
+      typeField.value = btn.getAttribute('data-type');
+      confirmBox.classList.add('show');
+      confirmBox.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Best-effort location capture — form still submits fine if this fails or times out.
+  var form = document.getElementById('alertForm');
+  var sendBtn = document.getElementById('sendBtn');
+  var locationCaptured = false;
+
+  form.addEventListener('submit', function (e) {
+    if (locationCaptured || !navigator.geolocation) return; // let it submit
+    e.preventDefault();
+    sendBtn.textContent = 'Locating...';
+    sendBtn.disabled = true;
+    var done = false;
+    var finish = function () {
+      if (done) return;
+      done = true;
+      locationCaptured = true;
+      form.submit();
+    };
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      document.getElementById('latField').value = pos.coords.latitude;
+      document.getElementById('lngField').value = pos.coords.longitude;
+      finish();
+    }, finish, { timeout: 2000 });
+    setTimeout(finish, 2200);
+  });
+</script>
+</body>
+</html>

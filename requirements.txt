@@ -1,0 +1,8 @@
+streamlit
+gspread
+google-auth
+pandas
+plotly
+qrcode[pil]
+python-dotenv
+streamlit-autorefresh

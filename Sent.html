@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 60px 20px; background: #f4f4f2; color: #1a1a1a; text-align: center; }
+  .badge { width: 64px; height: 64px; border-radius: 50%; background: #3B6D11; color: #fff; font-size: 32px; line-height: 64px; margin: 0 auto 20px; }
+  h1 { font-size: 22px; margin: 0 0 8px; }
+  p { color: #555; font-size: 15px; }
+  .call-btn { display: inline-block; margin-top: 24px; background: #1a3c34; color: #fff; text-decoration: none; padding: 14px 22px; border-radius: 10px; font-weight: 600; }
+  .ref { color: #999; font-size: 12px; margin-top: 20px; }
+</style>
+</head>
+<body>
+  <div class="badge">&#10003;</div>
+  <? if (isDuplicate) { ?>
+    <h1>Already reported</h1>
+    <p>This location already has an open <?= type ?> report — responders were notified moments ago, no need to send again.</p>
+  <? } else { ?>
+    <h1>Alert sent</h1>
+    <p><?= type ?> reported at <?= locName ?>. Responders have been notified by email.</p>
+  <? } ?>
+  <a class="call-btn" href="tel:<?= callNumber ?>">Still call: <?= callNumber ?></a>
+  <div class="ref">Reference: <?= id ?></div>
+</body>
+</html>
